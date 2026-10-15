@@ -168,6 +168,33 @@ class GuardTests(unittest.TestCase):
         self.assertFalse(ok)
         self.assertTrue(motivo.startswith("Dentro de pasta de configuração"), motivo)
 
+    def test_remove_directory_sem_shell_nome_com_metacaracteres_de_cmd(self):
+        nome = os.path.join(self.tmp, "p&q%PATH%^x(1)!")
+        self._escreve(os.path.join(nome, "dentro", "a.txt"), "x")
+        self.assertTrue(h.remove_directory(nome))
+        self.assertFalse(os.path.exists(nome))
+
+    def test_remove_directory_apaga_arquivo_somente_leitura(self):
+        import stat
+        alvo = os.path.join(self.tmp, "ro")
+        arq = os.path.join(alvo, "f.txt")
+        self._escreve(arq, "x")
+        os.chmod(arq, stat.S_IREAD)
+        self.assertTrue(h.remove_directory(alvo))
+        self.assertFalse(os.path.exists(alvo))
+
+    def test_remove_directory_caminho_acima_de_260_caracteres(self):
+        base = os.path.join(self.tmp, "longo")
+        fundo = base
+        for i in range(12):
+            fundo = os.path.join(fundo, "n" * 28 + str(i))
+        self.assertGreater(len(fundo), 300)
+        os.makedirs("\\\\?\\" + fundo)
+        with open("\\\\?\\" + os.path.join(fundo, "x.txt"), "w") as f:
+            f.write("x")
+        self.assertTrue(h.remove_directory(base))
+        self.assertFalse(os.path.exists(base))
+
     def _roda_main(self, *argumentos):
         import contextlib
         import io

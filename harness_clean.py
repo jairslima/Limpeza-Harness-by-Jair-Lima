@@ -520,24 +520,32 @@ def scan_disposable_folders(min_inactive_days: int = 0) -> list:
     return candidates
 
 def remove_directory(path: str) -> bool:
-    """Remove diretório com comando nativo otimizado do Windows e fallback com remoção de read-only."""
-    subprocess.run(["cmd", "/c", "rd", "/s", "/q", path], capture_output=True)
-    if not os.path.exists(path):
-        return True
-        
-    def remove_readonly(func, p, excinfo):
+    """
+    Remove o diretório SEM passar por shell: `cmd /c rd` interpretaria &, %, ^ e afins em nomes de pasta
+    sem espaço (revisão de segurança de 2026-10-15). Usa o prefixo de caminho longo do Windows (node_modules
+    costuma passar de 260 caracteres) e limpa o atributo somente leitura quando necessário.
+    """
+    alvo = os.path.abspath(path)
+    if os.name == "nt" and not alvo.startswith("\\\\?\\"):
+        alvo = "\\\\?\\" + alvo
+
+    def remove_readonly(func, p, _exc):
         try:
             os.chmod(p, stat.S_IWRITE)
             func(p)
         except Exception:
             pass
-            
+
     try:
-        shutil.rmtree(path, onerror=remove_readonly)
+        try:
+            shutil.rmtree(alvo, onexc=remove_readonly)
+        except TypeError:  # Python anterior a 3.12
+            shutil.rmtree(alvo, onerror=remove_readonly)
     except Exception:
         pass
-        
+
     return not os.path.exists(path)
+
 
 def main():
     parser = argparse.ArgumentParser(
