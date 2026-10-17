@@ -15,8 +15,8 @@ O objetivo é manter o disco C: livre de dados temporários inflados (como `node
 * `GEMINI.md`: Este resumo técnico para continuidade por outros modelos de IA.
 * `LICENSE`: Licença de software livre MIT.
 * `README.md`: Guia de utilização para linha de comando e agendador de tarefas.
-* `C:\Users\jairs\bin\harness-clean.ps1`: Wrapper executável no PowerShell.
-* `C:\Users\jairs\bin\harness-clean.cmd`: Wrapper executável no CMD e atalhos em lote.
+* `%USERPROFILE%\bin\harness-clean.ps1`: Wrapper executável no PowerShell.
+* `%USERPROFILE%\bin\harness-clean.cmd`: Wrapper executável no CMD e atalhos em lote.
 
 ---
 
@@ -39,6 +39,6 @@ O objetivo é manter o disco C: livre de dados temporários inflados (como `node
 ## Agendamento Mensal no Windows (00:00)
 A tarefa é registrada no Agendador de Tarefas do Windows via comando administrativo:
 ```powershell
-schtasks /Create /TN "HarnessMonthlyCleanup by Jair Lima" /TR "powershell -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -File \"C:\Users\jairs\bin\harness-clean.ps1\" --auto" /SC MONTHLY /D 1 /ST 00:00 /RL HIGHEST /F
+schtasks /Create /TN "HarnessMonthlyCleanup by Jair Lima" /TR "powershell -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -File \"%USERPROFILE%\bin\harness-clean.ps1\" --auto" /SC MONTHLY /D 1 /ST 00:00 /RL HIGHEST /F
 ```
-Essa instrução roda no dia 1º de cada mês às 00:00, salvando o relatório em `C:\Users\jairs\.gemini\harness_cleanup.log` e o manifesto em `C:\Users\jairs\.gemini\harness_cleanup_manifest.json`.
+Essa instrução roda no dia 1º de cada mês às 00:00, salvando o relatório em `%USERPROFILE%\.gemini\harness_cleanup.log` e o manifesto em `%USERPROFILE%\.gemini\harness_cleanup_manifest.json`.

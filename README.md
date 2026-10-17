@@ -7,7 +7,15 @@ Utilitário de linha de comando e automação mensal para manutenção preventiv
 * **Preservação de Projetos em Uso:** Opção de ignorar pastas modificadas recentemente para não interromper trabalhos ativos.
 * **Exclusão de Alto Desempenho:** Utiliza rotinas nativas do Windows para remoção quase instantânea de estruturas densas como `node_modules`.
 * **Modo Simulação:** Permite verificar com `--dry-run` o volume de espaço a ser liberado antes de qualquer alteração física.
-* **Histórico e Logs:** Registra detalhes de cada execução em `C:\Users\jairs\.gemini\harness_cleanup.log`.
+* **Histórico e Logs:** Registra detalhes de cada execução em `%USERPROFILE%\.gemini\harness_cleanup.log`.
+
+## Aviso
+
+Esta ferramenta **apaga pastas** (`node_modules`, `venv`, `dist` e semelhantes). Comece sempre por `--dry-run`. As pastas de harness vigiladas ficam em `ALLOWED_HARNESS_ROOTS` e nos demais caminhos no início de `harness_clean.py`, relativos ao seu diretório de usuário (`HOME`). Revise essas listas para o seu ambiente antes de usar `--auto` ou `--all`.
+
+## Requisitos
+
+Windows, Python 3.10 ou superior, sem dependências externas. Testes: `python test_harness_clean.py`.
 
 ## Como Usar
 

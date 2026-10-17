@@ -18,6 +18,8 @@ import re
 import argparse
 import subprocess
 from datetime import datetime, timedelta
+
+HOME = os.path.expanduser("~")
 from pathlib import Path
 
 # Allowlist estrita de pastas descartáveis
@@ -28,19 +30,19 @@ DISPOSABLE_NAMES = {
 
 # Raízes autorizadas para busca (apenas pastas de harnesses do usuário)
 ALLOWED_HARNESS_ROOTS = [
-    r"C:\Users\jairs\Antigravity",
-    r"C:\Users\jairs\Claude",
-    r"C:\Users\jairs\Codex",
-    r"C:\Users\jairs\Copilot",
-    r"C:\Users\jairs\Gemini",
-    r"C:\Users\jairs\Grok",
-    r"C:\Users\jairs\Hermes",
-    r"C:\Users\jairs\Kimi",
-    r"C:\Users\jairs\Kiro",
-    r"C:\Users\jairs\Qwen",
-    r"C:\Users\jairs\OpenCode",
-    r"C:\Users\jairs\Droid",
-    r"C:\Users\jairs\Kilo"
+    HOME + r"\Antigravity",
+    HOME + r"\Claude",
+    HOME + r"\Codex",
+    HOME + r"\Copilot",
+    HOME + r"\Gemini",
+    HOME + r"\Grok",
+    HOME + r"\Hermes",
+    HOME + r"\Kimi",
+    HOME + r"\Kiro",
+    HOME + r"\Qwen",
+    HOME + r"\OpenCode",
+    HOME + r"\Droid",
+    HOME + r"\Kilo"
 ]
 
 # Extensões vitais blindadas: se uma pasta contiver arquivos desse tipo, ela NUNCA será apagada
@@ -56,8 +58,8 @@ CRITICAL_NAME_PREFIXES = (
     "credentials", "serviceaccount", "service-account", "secrets"
 )
 
-DEFAULT_LOG_PATH = r"C:\Users\jairs\.gemini\harness_cleanup.log"
-DEFAULT_MANIFEST_PATH = r"C:\Users\jairs\.gemini\harness_cleanup_manifest.json"
+DEFAULT_LOG_PATH = HOME + r"\.gemini\harness_cleanup.log"
+DEFAULT_MANIFEST_PATH = HOME + r"\.gemini\harness_cleanup_manifest.json"
 
 def log_message(msg: str, log_file: str = DEFAULT_LOG_PATH, to_console: bool = True):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -207,29 +209,29 @@ def has_project_manifest(parent_path: str, folder_type: str, full_target_path: s
 # Onde ficam lançadores, atalhos e scripts que apontam para executáveis dentro de projetos
 # (pasta, extensões, varrer subpastas?). Qualquer pasta apontada por eles NUNCA é apagada.
 LAUNCHER_DIRS = [
-    (r"C:\Users\jairs\bin", (".cmd", ".bat", ".ps1", ".vbs"), False),
-    (r"C:\Users\jairs\Scripts", (".cmd", ".bat", ".ps1", ".vbs"), False),
-    (r"C:\Users\jairs\AppData\Roaming\npm", (".cmd", ".ps1"), False),
-    (r"C:\Users\jairs\Desktop", (".lnk", ".cmd", ".bat"), True),
-    (r"C:\Users\jairs\AppData\Roaming\Microsoft\Windows\Start Menu\Programs", (".lnk",), True),
+    (HOME + r"\bin", (".cmd", ".bat", ".ps1", ".vbs"), False),
+    (HOME + r"\Scripts", (".cmd", ".bat", ".ps1", ".vbs"), False),
+    (HOME + r"\AppData\Roaming\npm", (".cmd", ".ps1"), False),
+    (HOME + r"\Desktop", (".lnk", ".cmd", ".bat"), True),
+    (HOME + r"\AppData\Roaming\Microsoft\Windows\Start Menu\Programs", (".lnk",), True),
 ]
 CHECK_SCHEDULED_TASKS = True
 
 # Arquivos de configuração de harnesses (servidores MCP etc.) que também contam como referência.
 # (pasta, varrer subpastas?) Só .json/.toml/.yaml/.yml/.jsonc; documentação .md não conta.
-CONFIG_FILES = [r"C:\Users\jairs\.claude.json"]
+CONFIG_FILES = [HOME + r"\.claude.json"]
 CONFIG_DIRS = [
-    r"C:\Users\jairs\.claude", r"C:\Users\jairs\.codex", r"C:\Users\jairs\.gemini", r"C:\Users\jairs\.qwen",
-    r"C:\Users\jairs\.copilot", r"C:\Users\jairs\.kimi", r"C:\Users\jairs\.kiro", r"C:\Users\jairs\.grok",
-    r"C:\Users\jairs\.hermes", r"C:\Users\jairs\.cursor", r"C:\Users\jairs\.config\opencode",
-    r"C:\Users\jairs\.gemini\antigravity-cli",
+    HOME + r"\.claude", HOME + r"\.codex", HOME + r"\.gemini", HOME + r"\.qwen",
+    HOME + r"\.copilot", HOME + r"\.kimi", HOME + r"\.kiro", HOME + r"\.grok",
+    HOME + r"\.hermes", HOME + r"\.cursor", HOME + r"\.config\opencode",
+    HOME + r"\.gemini\antigravity-cli",
 ]
 CONFIG_EXTENSIONS = (".json", ".toml", ".yaml", ".yml", ".jsonc")
 # Registros desta própria ferramenta listam caminhos de execuções anteriores; nunca contam como configuração em uso.
 CONFIG_IGNORED_NAME_PARTS = ("cleanup_manifest", "harness_cleanup", "_manifest.json")
 
 # Pasta onde ficam os apps instalados: um dist/bin com executável que NÃO existe aqui pode ser a única cópia.
-INSTALL_DIR = r"C:\Users\jairs\bin"
+INSTALL_DIR = HOME + r"\bin"
 EXE_NAMES_IGNORED = {"unins000.exe", "python.exe", "pythonw.exe"}
 
 # Dependências de execução: se o PROJETO que as contém é apontado por lançador/configuração/tarefa, são preservadas.
@@ -446,7 +448,7 @@ def double_check_safety(path: str, min_inactive_days: int = 0) -> tuple:
     if any(p.lower() in PROTECTED_PATH_COMPONENTS for p in norm.split(os.sep)[:-1]):
         return False, "Dentro de pasta de configuração de harness (protegida)"
 
-    # Checagem 3: Profundidade mínima de 6 níveis (ex: C:\Users\jairs\<Harness>\<Projeto>\<Alvo>)
+    # Checagem 3: Profundidade mínima de 6 níveis (ex: <HOME>\<Harness>\<Projeto>\<Alvo>)
     parts = norm.split(os.sep)
     if len(parts) < 6:
         return False, f"Profundidade insuficiente ({len(parts)} níveis), não está contido em um subprojeto"

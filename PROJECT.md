@@ -2,7 +2,7 @@
 
 ## Descrição
 
-Utilitário de linha de comando que limpa, com várias camadas de segurança fail-closed, as pastas descartáveis (`node_modules`, `venv`, `.venv`, `env`, `build`, `dist`, `bin`, `obj`, `.next`, `__pycache__` e similares) dos workspaces de IA em `C:\Users\jairs\<Harness>\<Projeto>`. Roda sozinho todo dia 1 pela tarefa `HarnessMonthlyCleanup by Jair Lima`.
+Utilitário de linha de comando que limpa, com várias camadas de segurança fail-closed, as pastas descartáveis (`node_modules`, `venv`, `.venv`, `env`, `build`, `dist`, `bin`, `obj`, `.next`, `__pycache__` e similares) dos workspaces de IA em `%USERPROFILE%\<Harness>\<Projeto>`. Roda sozinho todo dia 1 pela tarefa `HarnessMonthlyCleanup by Jair Lima`.
 
 ## Stack e dependências
 
@@ -15,7 +15,7 @@ Utilitário de linha de comando que limpa, com várias camadas de segurança fai
 - `test_harness_clean.py`: 24 testes automatizados (`unittest`), incluindo execução real em árvore de teste.
 - `SPEC.md`: especificação e todas as proteções (seções 1 a 5).
 - `README.md`, `GEMINI.md`: documentação de uso e continuidade.
-- Alias global: `C:\Users\jairs\bin\harness-clean.cmd` e `harness-clean.ps1`.
+- Alias global: `%USERPROFILE%\bin\harness-clean.cmd` e `harness-clean.ps1`.
 
 ## Comandos essenciais
 
@@ -34,7 +34,7 @@ python test_harness_clean.py            roda os testes
 - Simulação por padrão; execução real exige `--auto` ou `--all`.
 - Fail-closed: qualquer erro ao levantar referências, processos ou arquivos bloqueia a exclusão.
 - Pasta só é apagada se estiver na lista de nomes autorizados, dentro de uma raiz de harness, com manifesto de recriação (`package.json`, `requirements.txt`...), sem dados vitais, sem uso e sem referência.
-- Preserva o que é apontado por lançador, atalho, tarefa agendada, configuração de harness (MCP etc.) ou atalho global do `npm`; preserva `venv` e `node_modules` de projeto em uso; preserva `dist`/`bin` com executável que não está instalado em `C:\Users\jairs\bin`; nunca toca em `.claude`, `.codex`, `.gemini`, `.mira` e similares.
+- Preserva o que é apontado por lançador, atalho, tarefa agendada, configuração de harness (MCP etc.) ou atalho global do `npm`; preserva `venv` e `node_modules` de projeto em uso; preserva `dist`/`bin` com executável que não está instalado em `%USERPROFILE%\bin`; nunca toca em `.claude`, `.codex`, `.gemini`, `.mira` e similares.
 - `venv` sem manifesto de dependências nunca é apagado (o ambiente é o único registro).
 - Teto por execução real: mais de 15 pastas pesadas (tudo que não é cache) ou 2 GB abortam sem apagar nada.
 - Os registros da própria ferramenta (`*_manifest.json`) são ignorados na varredura de configurações.
@@ -49,5 +49,5 @@ python test_harness_clean.py            roda os testes
 ## Próximos passos e problemas conhecidos
 
 - Próxima execução automática: 01/11/2026 às 00:00 (tarefa `HarnessMonthlyCleanup by Jair Lima`, `--auto`).
-- Limitação: caminhos montados por variáveis de ambiente ou dinamicamente por um script não são detectados; por isso o app instalado deve ficar em `C:\Users\jairs\bin`.
+- Limitação: caminhos montados por variáveis de ambiente ou dinamicamente por um script não são detectados; por isso o app instalado deve ficar em `%USERPROFILE%\bin`.
 - O projeto não tinha repositório git até 2026-10-15; commits locais, sem remote.
