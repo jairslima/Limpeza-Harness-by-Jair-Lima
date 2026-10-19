@@ -7,3 +7,8 @@ secrets.*
 *.pkl
 *.pem
 credentials.*
+
+# Seguranca - auditoria automatica
+.env.*
+*.p12
+*.pfx
